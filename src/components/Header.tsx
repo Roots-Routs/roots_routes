@@ -47,7 +47,7 @@ const Header: React.FC = () => {
             <Link 
               to="/admin" 
               className={`font-medium transition-colors ${
-                location.pathname === '/admin' 
+                location.pathname === '/admin' || location.pathname === '/login'
                   ? 'text-green-800 border-b-2 border-amber-400' 
                   : 'text-gray-700 hover:text-green-800'
               }`}

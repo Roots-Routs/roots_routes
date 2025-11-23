@@ -108,7 +108,7 @@ export const TourRouteForm: React.FC<FormProps> = ({ onClose, onSave, initialDat
               Image URL
             </label>
             <input
-              type="url"
+              type="text"
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"

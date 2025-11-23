@@ -32,6 +32,7 @@ export default function LoginPage() {
            navigate(from, { replace: true });
         } else {
            setMessage('Registration successful! Please check your email to confirm your account.');
+           setIsSignUp(false);
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -49,16 +50,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-green-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 mb-4">
-            <Lock className="w-6 h-6 text-emerald-800" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
+            <Lock className="w-6 h-6 text-green-800" />
           </div>
-          <h2 className="text-2xl font-serif text-stone-900">
+          <h2 className="text-2xl font-serif text-gray-900">
             {isSignUp ? 'Create Admin Account' : 'Admin Login'}
           </h2>
-          <p className="text-stone-600 mt-2">
+          <p className="text-gray-600 mt-2">
             {isSignUp ? 'Sign up to manage the dashboard' : 'Sign in to access the dashboard'}
           </p>
         </div>
@@ -77,7 +78,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleAuth} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
             <input
@@ -85,13 +86,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
               placeholder="admin@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <input
@@ -100,7 +101,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -108,7 +109,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-900 text-white py-2 px-4 rounded-md hover:bg-emerald-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-amber-400 text-green-900 font-bold py-2 px-4 rounded-md hover:bg-amber-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
           </button>
@@ -121,7 +122,7 @@ export default function LoginPage() {
               setError(null);
               setMessage(null);
             }}
-            className="text-sm text-emerald-700 hover:text-emerald-900 font-medium"
+            className="text-sm text-amber-600 hover:text-amber-700 font-medium"
           >
             {isSignUp
               ? 'Already have an account? Sign In'
