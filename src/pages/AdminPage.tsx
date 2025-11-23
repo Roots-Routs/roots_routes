@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSupabaseData } from '../hooks/useSupabaseData';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Users, MapPin, Calendar, Utensils, Bed, Heart, Plus, CreditCard as Edit, Trash2, ExternalLink, BarChart3, Settings } from 'lucide-react';
+import { Users, MapPin, Calendar, Utensils, Bed, Heart, Plus, CreditCard as Edit, Trash2, ExternalLink, BarChart3, Settings, LogOut } from 'lucide-react';
 import { TourRouteForm, ExperienceForm, AccommodationForm, PartnerForm } from '../components/AdminForms';
 
 const AdminPage: React.FC = () => {
+  const { user, signOut } = useAuth();
   const { heritageThemes, tourRoutes, experiences, accommodations, partners, loading, error, refetch } = useSupabaseData();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showForm, setShowForm] = useState<string | null>(null);
@@ -107,7 +109,7 @@ const AdminPage: React.FC = () => {
   const renderDashboard = () => (
     <div className="space-y-6">
       <div className="bg-green-800 text-white rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-2">Welcome to Roots & Routes Admin</h2>
+        <h2 className="text-2xl font-bold mb-2">Welcome, {user?.email?.split('@')[0] || 'Admin'}</h2>
         <p className="text-green-100">
           Manage your heritage tours, experiences, accommodations, and partners all in one place.
         </p>
@@ -491,7 +493,14 @@ const AdminPage: React.FC = () => {
               </Link>
               <div className="flex items-center space-x-2">
                 <Settings className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Admin</span>
+                <span className="text-sm text-gray-600">{user?.email || 'Admin'}</span>
+                <button 
+                  onClick={signOut}
+                  className="text-gray-400 hover:text-red-600 ml-2 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
