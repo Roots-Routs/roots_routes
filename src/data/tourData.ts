@@ -1,4 +1,4 @@
-import { HeritageTheme, TourRoute, Experience } from '../types/tour';
+import { HeritageTheme, TourRoute, Experience, Museum } from '../types/tour';
 import { Accommodation } from '../types/tour';
 import { useSupabaseData } from '../hooks/useSupabaseData';
 
@@ -435,6 +435,25 @@ export const fallbackExperiences: Experience[] = [
   }
 ];
 
+export const fallbackMuseum: Museum[] = [
+  {
+    id: '1',
+    name: 'Museum Of The Highwood',
+    streetNumber: '735',
+    address: 'Main St',
+    city: 'High River',
+    Province: 'Alberta',
+    region: 'Southern Alberta',
+    postalCode: 'T1V 1N3',
+    phone: '403-652-2110',
+    email: 'info@museumofthehighwood.com',
+    mobile: '403-652-2111',
+    facebook: 'https://www.facebook.com/museumofthehighwood',
+    website: 'https://museumofthehighwood.com/',
+    theme: 'western'
+  },
+];
+
 export const fallbackAccommodations: Accommodation[] = [
   {
     id: 'heritage-inn',
@@ -534,3 +553,4 @@ export const heritageThemes = fallbackHeritageThemes;
 export const tourRoutes = fallbackTourRoutes;
 export const experiences = fallbackExperiences;
 export const accommodations = fallbackAccommodations;
+export const museums = fallbackMuseum;

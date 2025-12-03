@@ -27,6 +27,23 @@ export interface Experience {
   image: string;
 }
 
+export interface Museum {
+  id: string;
+  name: string;
+  website: string;
+  streetNumber: string;
+  address: string;
+  city: string;
+  Province: string;
+  region: string;
+  postalCode: string;
+  phone: string;
+  email: string;
+  mobile: string;
+  facebook: string;
+  theme: string;
+}
+
 export interface Accommodation {
   id: string;
   name: string;
@@ -44,6 +61,7 @@ export interface DailyExperiences {
   supperRestaurant?: Experience;
   fullDayExperience?: Experience;
   accommodation?: Accommodation;
+  museum?: Museum;
 }
 
 export interface TourSelection {

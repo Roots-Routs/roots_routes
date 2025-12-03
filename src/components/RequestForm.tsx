@@ -4,6 +4,7 @@ import { useTour } from '../context/TourContext';
 import { Send, User, Mail, Phone, Users, Calendar, Utensils, Accessibility, Heart, MapPin, Bus } from 'lucide-react';
 import DailyExperienceSelector from './DailyExperienceSelector';
 import TourMap from './TourMap';
+import { sendEmail } from '../lib/resend';
 
 const RequestForm: React.FC = () => {
   const navigate = useNavigate();
@@ -23,10 +24,95 @@ const RequestForm: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    navigate('/confirmation');
+    const formattedRequest = {
+      customerName: formData.name,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      groupSize: formData.groupSize,
+      preferredDates: formData.preferredDates,
+      specialDietary: formData.dietaryRequirements,
+      accessibilityNeeds: formData.accessibilityNeeds,
+      heritageInterest: formData.heritageBackground,
+      tourSummary: {
+        route: tourSelection.route?.name,
+        duration: `${tourSelection.route?.duration} days`,
+        totalExperiences: getTotalExperiencesCount(),
+        selectedExperiences: tourSelection.dailyExperiences
+      },
+      totalCoordinatedPrice: getCoordinatedPrice()
+    };
+
+    console.log('Formatted Request Payload:', formattedRequest);
+
+    const dailyItinerary = formattedRequest.tourSummary.selectedExperiences
+      .map((day: any, index: number) => {
+        const dayNumber = index + 1;
+        const activities = [];
+        
+        if (day.fullDayExperience) activities.push(`<li><strong>Full Day:</strong> ${day.fullDayExperience.name} ($${day.fullDayExperience.price})</li>`);
+        if (day.morningExperience) activities.push(`<li><strong>Morning:</strong> ${day.morningExperience.name} ($${day.morningExperience.price})</li>`);
+        if (day.lunchRestaurant) activities.push(`<li><strong>Lunch:</strong> ${day.lunchRestaurant.name} ($${day.lunchRestaurant.price})</li>`);
+        if (day.afternoonExperience) activities.push(`<li><strong>Afternoon:</strong> ${day.afternoonExperience.name} ($${day.afternoonExperience.price})</li>`);
+        if (day.supperRestaurant) activities.push(`<li><strong>Supper:</strong> ${day.supperRestaurant.name} ($${day.supperRestaurant.price})</li>`);
+        if (day.accommodation) activities.push(`<li><strong>Accommodation:</strong> ${day.accommodation.name} ($${day.accommodation.pricePerRoom / 2} per person)</li>`);
+
+        if (activities.length === 0) return null;
+
+        return `
+          <div style="margin-bottom: 15px;">
+            <h3 style="color: #b45309; margin-bottom: 5px;">Day ${dayNumber}</h3>
+            <ul style="margin-top: 0; padding-left: 20px;">
+              ${activities.join('')}
+            </ul>
+          </div>
+        `;
+      })
+      .filter(Boolean)
+      .join('');
+
+    const emailBody = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #166534; border-bottom: 2px solid #166534; padding-bottom: 10px;">New Tour Request Submission</h1>
+        
+        <h2 style="color: #166534; margin-top: 20px;">Customer Information</h2>
+        <p><strong>Name:</strong> ${formattedRequest.customerName}</p>
+        <p><strong>Email:</strong> ${formattedRequest.customerEmail}</p>
+        <p><strong>Phone:</strong> ${formattedRequest.customerPhone}</p>
+        <p><strong>Group Size:</strong> ${formattedRequest.groupSize}</p>
+        <p><strong>Preferred Dates:</strong> ${formattedRequest.preferredDates}</p>
+
+        <h2 style="color: #166534; margin-top: 20px;">Special Requirements</h2>
+        <p><strong>Dietary:</strong> ${formattedRequest.specialDietary || 'None'}</p>
+        <p><strong>Accessibility:</strong> ${formattedRequest.accessibilityNeeds || 'None'}</p>
+        <p><strong>Heritage Interest:</strong> ${formattedRequest.heritageInterest || 'None'}</p>
+
+        <h2 style="color: #166534; margin-top: 20px;">Tour Summary</h2>
+        <p><strong>Route:</strong> ${formattedRequest.tourSummary.route}</p>
+        <p><strong>Duration:</strong> ${formattedRequest.tourSummary.duration}</p>
+        <p><strong>Total Experiences:</strong> ${formattedRequest.tourSummary.totalExperiences}</p>
+
+        <h2 style="color: #166534; margin-top: 20px;">Daily Itinerary</h2>
+        ${dailyItinerary}
+
+        <h2 style="color: #166534; margin-top: 20px;">Pricing</h2>
+        <p style="font-size: 1.2em;"><strong>Total Coordinated Price:</strong> $${formattedRequest.totalCoordinatedPrice}</p>
+      </div>
+    `;
+
+    console.log('Email Body (TXT):', emailBody);
+
+    try {
+      // Send to admin email
+      await sendEmail('frankieliu97@gmail.com', 'New Tour Request Submission', emailBody);
+      
+      alert('Request submitted successfully! We will contact you shortly.');
+      navigate('/confirmation');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      alert('There was an error submitting your request. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = formData.name && formData.email && formData.phone && formData.groupSize > 0;

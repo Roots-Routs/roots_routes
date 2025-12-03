@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
-import { Experience, DailyExperiences } from '../types/tour';
-import { experiences, accommodations } from '../data/tourData';
+import { Experience, DailyExperiences, Museum } from '../types/tour';
+import { experiences, accommodations, museums } from '../data/tourData';
 import { useTour } from '../context/TourContext';
-import { Clock, MapPin, Utensils, Star, DollarSign, Bed, Wifi, Coffee, Car, Dumbbell, Sun, Moon } from 'lucide-react';
+import { Clock, MapPin, Utensils, Star, DollarSign, Bed, Wifi, Coffee, Car, Dumbbell, Sun, Moon, Building2 } from 'lucide-react';
 
 interface DailyExperienceSelectorProps {
   dayIndex: number;
@@ -26,7 +26,8 @@ const DailyExperienceSelector: React.FC<DailyExperienceSelectorProps> = ({ dayIn
     { id: 'lunch', label: 'Lunch', icon: Utensils, hasContent: lunchRestaurants.length > 0 },
     { id: 'afternoon', label: 'Afternoon', icon: MapPin, hasContent: afternoonAttractions.length > 0 },
     { id: 'hotel', label: 'Hotel', icon: Bed, hasContent: dayIndex < (tourSelection.route?.duration || 0) - 1 },
-    { id: 'supper', label: 'Supper', icon: Moon, hasContent: supperRestaurants.length > 0 }
+    { id: 'supper', label: 'Supper', icon: Moon, hasContent: supperRestaurants.length > 0 },
+    { id: 'museum', label: 'Museum', icon: Building2, hasContent: museums.length > 0 } // ✅ 修改 icon
   ];
 
   const getTabSelectionCount = (tabId: string) => {
@@ -43,6 +44,8 @@ const DailyExperienceSelector: React.FC<DailyExperienceSelectorProps> = ({ dayIn
         return dayExperiences.accommodation ? 1 : 0;
       case 'supper':
         return dayExperiences.supperRestaurant ? 1 : 0;
+      case 'museum':
+        return dayExperiences.museum ? 1 : 0; // ✅ 修改判断
       default:
         return 0;
     }
@@ -133,6 +136,68 @@ const DailyExperienceSelector: React.FC<DailyExperienceSelectorProps> = ({ dayIn
           <span>Full Day Experience</span>
         </div>
       )}
+    </div>
+  );
+
+  // ✅ 添加 Museum Card 组件
+  const MuseumCard: React.FC<{ 
+    museum: Museum; 
+    isSelected: boolean; 
+    onSelect: () => void;
+    onDeselect: () => void;
+  }> = ({ museum, isSelected, onSelect, onDeselect }) => (
+    <div
+      onClick={isSelected ? onDeselect : onSelect}
+      className={`cursor-pointer rounded-lg border-2 p-4 transition-all duration-300 hover:shadow-md ${
+        isSelected 
+          ? 'border-amber-400 bg-amber-50 shadow-md' 
+          : 'border-gray-200 bg-white hover:border-green-300'
+      }`}
+    >
+      <div className="mb-3">
+        <div className="w-full h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+          <Building2 className="h-16 w-16 text-green-600" />
+        </div>
+      </div>
+      
+      <div className="flex items-start justify-between mb-2">
+        <span className={`px-2 py-1 rounded-full text-xs font-bold border ${getThemeColor(museum.theme)}`}>
+          {museum.theme.charAt(0).toUpperCase() + museum.theme.slice(1)}
+        </span>
+      </div>
+      
+      <h5 className="font-bold text-green-800 mb-2 text-sm leading-tight">
+        {museum.name}
+      </h5>
+      
+      <div className="space-y-1 mb-2">
+        <div className="flex items-start space-x-2 text-xs text-gray-600">
+          <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
+          <span>{museum.streetNumber} {museum.address}, {museum.city}</span>
+        </div>
+        {museum.phone && (
+          <div className="flex items-center space-x-2 text-xs text-gray-600">
+            <span>📞</span>
+            <span>{museum.phone}</span>
+          </div>
+        )}
+        {museum.website && (
+          <a
+            href={museum.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center space-x-2 text-xs text-blue-600 hover:text-blue-800"
+          >
+            <span>🌐</span>
+            <span className="underline">Visit Website</span>
+          </a>
+        )}
+      </div>
+      
+      <div className="text-xs text-gray-500 mt-2">
+        {museum.postalCode}
+      </div>
     </div>
   );
 
@@ -353,6 +418,28 @@ const DailyExperienceSelector: React.FC<DailyExperienceSelectorProps> = ({ dayIn
                   isSelected={dayExperiences.supperRestaurant?.id === experience.id}
                   onSelect={() => updateDailyExperience(dayIndex, 'supperRestaurant', experience)}
                   onDeselect={() => updateDailyExperience(dayIndex, 'supperRestaurant', undefined)}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
+      // ✅ 添加 Museum 标签页内容
+      case 'museum':
+        return (
+          <div className="mb-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <Building2 className="h-5 w-5 text-amber-500" />
+              <h4 className="text-lg font-bold text-green-800">Museums & Cultural Centers</h4>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {museums.map(museum => (
+                <MuseumCard
+                  key={museum.id}
+                  museum={museum}
+                  isSelected={dayExperiences.museum?.id === museum.id}
+                  onSelect={() => updateDailyExperience(dayIndex, 'museum', museum as any)}
+                  onDeselect={() => updateDailyExperience(dayIndex, 'museum', undefined)}
                 />
               ))}
             </div>
